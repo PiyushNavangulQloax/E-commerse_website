@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, Star, Check, Truck, ShieldCheck, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Heart, Star, Check, Truck, ShieldCheck, Sparkles, ChevronLeft, ChevronRight, ArrowRightLeft } from 'lucide-react';
 import { useQuickView } from '../../context/QuickViewContext';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
+import { useCompare } from '../../context/CompareContext';
 import { Link } from 'react-router-dom';
 import Button from '../common/Button';
 
@@ -11,6 +12,7 @@ const QuickViewModal = () => {
   const { selectedProduct, isOpen, closeQuickView } = useQuickView();
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const { isInCompare, toggleCompare } = useCompare();
 
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -32,6 +34,7 @@ const QuickViewModal = () => {
     : [selectedProduct.image || '/demo-saree.jpg'];
 
   const isFavorited = isInWishlist(selectedProduct._id);
+  const isCompared = isInCompare(selectedProduct._id);
 
   const handleAddToCart = () => {
     setAddedAnimation(true);
@@ -240,6 +243,18 @@ const QuickViewModal = () => {
                       </>
                     )}
                   </Button>
+
+                  <button
+                    onClick={() => toggleCompare(selectedProduct)}
+                    className={`p-3.5 rounded-2xl border transition-all ${
+                      isCompared
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border bg-surface hover:bg-surface/80 text-text'
+                    }`}
+                    aria-label="Add to compare"
+                  >
+                    <ArrowRightLeft size={20} />
+                  </button>
 
                   <button
                     onClick={() => toggleWishlist(selectedProduct)}

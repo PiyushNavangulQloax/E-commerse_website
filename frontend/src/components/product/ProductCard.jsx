@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { Heart, ArrowRightLeft } from 'lucide-react';
 import Button from '../common/Button';
 import { useWishlist } from '../../context/WishlistContext';
 import { useQuickView } from '../../context/QuickViewContext';
+import { useCompare } from '../../context/CompareContext';
 
 const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { openQuickView } = useQuickView();
+  const { isInCompare, toggleCompare } = useCompare();
 
   const isFavorited = isInWishlist(product._id || product.id);
+  const isCompared = isInCompare(product._id || product.id);
 
   const primaryImage = product.images?.[0] || product.image;
   const secondaryImage = product.images?.[1] || primaryImage;
@@ -78,6 +81,25 @@ const ProductCard = ({ product }) => {
         >
           <motion.div whileTap={{ scale: 0.8 }}>
             <Heart size={16} className={isFavorited ? "fill-red-500 stroke-red-500" : ""} />
+          </motion.div>
+        </button>
+
+        {/* Compare Button */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleCompare(product);
+          }}
+          className={`absolute top-16 right-4 p-2.5 rounded-full transition-all z-10 shadow-sm ${
+            isCompared
+              ? 'bg-primary text-background shadow-md'
+              : 'bg-background/80 backdrop-blur-md text-text hover:text-primary'
+          }`}
+          aria-label="Toggle Compare"
+        >
+          <motion.div whileTap={{ scale: 0.8 }}>
+            <ArrowRightLeft size={16} />
           </motion.div>
         </button>
 

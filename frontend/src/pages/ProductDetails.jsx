@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Truck, RefreshCw, ChevronDown, Check, Star, ShieldCheck, Sparkles, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, Truck, RefreshCw, ChevronDown, Check, Star, ShieldCheck, Sparkles, ArrowRight, ChevronLeft, ChevronRight, ArrowRightLeft } from 'lucide-react';
 import Button from '../components/common/Button';
 import { FadeIn, RevealOnScroll } from '../components/animations/RevealOnScroll';
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useCompare } from '../context/CompareContext';
 import ProductCard from '../components/product/ProductCard';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const { addToCart, openCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const { isInCompare, toggleCompare } = useCompare();
 
   // Look up product from central catalog, fallback gracefully
   const product = products.find(p => p._id === id || p.slug === id) || products[0];
@@ -33,6 +35,7 @@ const ProductDetails = () => {
 
   const images = product.images?.length > 0 ? product.images : [product.image || '/demo-saree.jpg'];
   const isFavorited = isInWishlist(product._id);
+  const isCompared = isInCompare(product._id);
 
   // Related products from same category or others
   const relatedProducts = products
@@ -253,6 +256,21 @@ const ProductDetails = () => {
                     </>
                   )}
                 </Button>
+
+                {/* Compare Button */}
+                <button
+                  onClick={() => toggleCompare(product)}
+                  className={`w-14 h-14 flex-shrink-0 flex items-center justify-center rounded-xl border transition-all ${
+                    isCompared
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border bg-surface hover:bg-surface/80 text-text'
+                  }`}
+                  aria-label="Add to compare"
+                >
+                  <motion.div whileTap={{ scale: 0.8 }}>
+                    <ArrowRightLeft size={22} />
+                  </motion.div>
+                </button>
 
                 {/* Like / Wishlist Button */}
                 <button

@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { QuickViewProvider } from './context/QuickViewContext';
+import { CompareProvider } from './context/CompareContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
@@ -12,9 +13,11 @@ import ScrollToTop from './components/common/ScrollToTop';
 import CartDrawer from './components/cart/CartDrawer';
 import WishlistDrawer from './components/wishlist/WishlistDrawer';
 import QuickViewModal from './components/product/QuickViewModal';
+import CompareWidget from './components/compare/CompareWidget';
 
 import Shop from './pages/Shop';
 import ProductDetails from './pages/ProductDetails';
+import Compare from './pages/Compare';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 
@@ -48,6 +51,7 @@ function AppLayout() {
           <Route path="/collections" element={<Shop />} />
           <Route path="/new-arrivals" element={<Shop />} />
           <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/compare" element={<Compare />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
@@ -72,6 +76,7 @@ function AppLayout() {
       <CartDrawer />
       <WishlistDrawer />
       <QuickViewModal />
+      <CompareWidget />
     </div>
   );
 }
@@ -83,9 +88,11 @@ function App() {
         <CartProvider>
           <WishlistProvider>
             <QuickViewProvider>
-              <Router>
-                <AppLayout />
-              </Router>
+              <CompareProvider>
+                <Router>
+                  <AppLayout />
+                </Router>
+              </CompareProvider>
             </QuickViewProvider>
           </WishlistProvider>
         </CartProvider>
