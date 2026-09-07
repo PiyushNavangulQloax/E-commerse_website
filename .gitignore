@@ -28,5 +28,6 @@ dist-ssr
 .env.*
 !.env.example
 
-# Temporary split frame folders
+# Temporary split frame folders and root videos
 ezgif-*/
+/*.mp4

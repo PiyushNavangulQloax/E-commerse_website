@@ -1,4 +1,4 @@
-import ScrollyCanvas from '../components/scrollytelling/ScrollyCanvas';
+import HeroVideo from '../components/home/HeroVideo';
 import FeaturedCategories from '../components/home/FeaturedCategories';
 import ProductCarouselSection from '../components/home/ProductCarouselSection';
 import SareeFeature from '../components/home/SareeFeature';
@@ -22,19 +22,17 @@ const Home = () => {
   return (
     <div className="w-full font-sans bg-[#121212]">
       {/* 
-        Awwwards-level Scrollytelling Section
-        This replaces the standard Hero section with a high-performance 
-        canvas image sequence scrubber and parallax overlays.
+        Hero Video Showcase:
+        Plays the raw silk bridal lehenga videos on loop with 3-phase timed 
+        narrative text transitions (3s, 3s, 5.5s).
       */}
-      <div className="relative">
-        <ScrollyCanvas />
-      </div>
+      <HeroVideo />
 
       {/* 
-        Below the scrollytelling experience, we transition into the 
+        Below the hero video, transition into the 
         bright, premium Indian fashion e-commerce showcase.
       */}
-      <div className="bg-background pt-24 rounded-t-[40px] -mt-[40px] relative z-30 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
+      <div id="featured-content" className="bg-background pt-20 rounded-t-[40px] -mt-[30px] relative z-30 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
         
         {/* 1. Explore Categories Grid */}
         <FeaturedCategories />
