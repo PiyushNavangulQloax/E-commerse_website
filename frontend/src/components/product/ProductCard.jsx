@@ -3,10 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import Button from '../common/Button';
+import { useWishlist } from '../../context/WishlistContext';
+import { useQuickView } from '../../context/QuickViewContext';
 
 const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { openQuickView } = useQuickView();
+
+  const isFavorited = isInWishlist(product._id || product.id);
 
   const primaryImage = product.images?.[0] || product.image;
   const secondaryImage = product.images?.[1] || primaryImage;
@@ -61,12 +66,18 @@ const ProductCard = ({ product }) => {
         <button
           onClick={(e) => {
             e.preventDefault();
-            setIsWishlisted(!isWishlisted);
+            e.stopPropagation();
+            toggleWishlist(product);
           }}
-          className="absolute top-4 right-4 p-2.5 bg-background/80 backdrop-blur-md rounded-full text-text hover:text-accent transition-colors z-10 shadow-sm"
+          className={`absolute top-4 right-4 p-2.5 rounded-full transition-all z-10 shadow-sm ${
+            isFavorited
+              ? 'bg-red-50 text-red-500 dark:bg-red-950/80 shadow-md'
+              : 'bg-background/80 backdrop-blur-md text-text hover:text-red-500'
+          }`}
+          aria-label="Toggle Wishlist"
         >
           <motion.div whileTap={{ scale: 0.8 }}>
-            <Heart size={16} className={isWishlisted ? "fill-accent stroke-accent" : ""} />
+            <Heart size={16} className={isFavorited ? "fill-red-500 stroke-red-500" : ""} />
           </motion.div>
         </button>
 
@@ -79,7 +90,15 @@ const ProductCard = ({ product }) => {
               exit={{ opacity: 0, y: 15 }}
               className="absolute bottom-6 left-0 w-full px-6 hidden md:block"
             >
-              <Button variant="secondary" className="w-full bg-background/95 backdrop-blur-md text-xs tracking-widest hover:bg-background">
+              <Button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  openQuickView(product);
+                }}
+                variant="secondary" 
+                className="w-full bg-background/95 backdrop-blur-md text-xs tracking-widest hover:bg-background"
+              >
                 Quick View
               </Button>
             </motion.div>

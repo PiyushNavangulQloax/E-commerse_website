@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { SocialMediaBar } from '../common/SocialIcons';
 
 const Footer = () => {
   return (
@@ -49,10 +50,8 @@ const Footer = () => {
         
         <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-text-muted">
           <p>&copy; {new Date().getFullYear()} ANVIKA. All rights reserved.</p>
-          <div className="flex gap-4">
-            <span>Instagram</span>
-            <span>Facebook</span>
-            <span>Pinterest</span>
+          <div className="flex items-center gap-4">
+            <SocialMediaBar size={17} className="flex items-center gap-3" itemClassName="text-text-muted hover:text-accent transition-colors bg-background p-2 rounded-full border border-border/60 hover:border-accent/40 shadow-sm" />
           </div>
         </div>
       </div>

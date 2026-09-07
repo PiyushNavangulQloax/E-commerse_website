@@ -27,8 +27,25 @@ const Overlay = ({ scrollYProgress: externalProgress }) => {
         style={{ opacity: opacity1, y: y1, display: display1 }}
         className="absolute inset-0 flex-col items-center justify-center text-center px-4"
       >
-        <h1 className="text-4xl md:text-6xl font-light tracking-tight">Anvika</h1>
-        <p className="text-xl md:text-2xl mt-4 tracking-widest uppercase font-medium text-white/70">Creative Fashion</p>
+        <span className="text-xs uppercase tracking-[0.3em] font-medium text-white/80 mb-3 block">Haute Couture & Heritage</span>
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-light tracking-wide drop-shadow-lg">Anvika</h1>
+        <p className="text-sm md:text-base mt-4 tracking-[0.25em] uppercase font-light text-white/80 max-w-md">
+          Timeless Indian Drapes & Contemporary Silhouettes
+        </p>
+        <div className="flex items-center gap-4 mt-8 pointer-events-auto">
+          <a 
+            href="#new-arrivals" 
+            className="px-6 py-2.5 rounded-full bg-white text-black text-xs uppercase tracking-widest font-medium hover:bg-white/90 transition-colors shadow-lg"
+          >
+            New Arrivals
+          </a>
+          <a 
+            href="#sarees" 
+            className="px-6 py-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/40 text-white text-xs uppercase tracking-widest font-medium hover:bg-white/20 transition-colors"
+          >
+            Explore Sarees
+          </a>
+        </div>
       </motion.div>
 
       {/* Section 2 - 30% */}
@@ -36,9 +53,21 @@ const Overlay = ({ scrollYProgress: externalProgress }) => {
         style={{ opacity: opacity2, y: y2, display: display2 }}
         className="absolute inset-0 flex-col items-start justify-center px-8 md:px-24"
       >
-        <h2 className="text-4xl md:text-7xl font-light max-w-2xl leading-tight drop-shadow-lg">
-          I build digital <br/> experiences.
+        <span className="text-xs uppercase tracking-[0.3em] font-medium text-accent mb-3 block">01 / The Handloom Craft</span>
+        <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-light max-w-2xl leading-tight drop-shadow-lg">
+          Drape your story <br/> in pure silk.
         </h2>
+        <p className="text-white/80 text-sm max-w-md mt-4 font-light leading-relaxed">
+          Woven with timeless motifs by generational master artisans across Varanasi, Chanderi, and Kanchipuram.
+        </p>
+        <div className="mt-8 pointer-events-auto">
+          <a 
+            href="#sarees" 
+            className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-white border-b border-white/60 pb-1 hover:border-white hover:text-accent transition-colors"
+          >
+            Discover Handloom Weaves →
+          </a>
+        </div>
       </motion.div>
 
       {/* Section 3 - 65% to 90% */}
@@ -46,9 +75,21 @@ const Overlay = ({ scrollYProgress: externalProgress }) => {
         style={{ opacity: opacity3, y: y3, display: display3 }}
         className="absolute inset-0 flex-col items-end justify-center px-8 md:px-24 text-right"
       >
-        <h2 className="text-4xl md:text-7xl font-light max-w-2xl leading-tight drop-shadow-lg">
-          Bridging design <br/> and engineering.
+        <span className="text-xs uppercase tracking-[0.3em] font-medium text-accent mb-3 block">02 / Festive Majesty</span>
+        <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-light max-w-2xl leading-tight drop-shadow-lg">
+          Where heritage <br/> meets modernity.
         </h2>
+        <p className="text-white/80 text-sm max-w-md mt-4 font-light leading-relaxed">
+          Bespoke silhouettes tailored with exacting finesse for weddings, festivals, and unforgettable milestones.
+        </p>
+        <div className="mt-8 pointer-events-auto">
+          <a 
+            href="#ethnic-wear" 
+            className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-white border-b border-white/60 pb-1 hover:border-white hover:text-accent transition-colors"
+          >
+            Explore Celebration Edit →
+          </a>
+        </div>
       </motion.div>
 
     </div>
