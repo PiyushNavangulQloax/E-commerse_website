@@ -14,7 +14,7 @@ services:
       - key: FRONTEND_URL
         fromService:
           type: web
-          name: anvika-frontend
+          name: anvika-26
           envVar: RENDER_EXTERNAL_URL
       - key: MONGO_URI
         sync: false # Set this securely in the Render dashboard
@@ -23,7 +23,7 @@ services:
 
   # Frontend React SPA
   - type: web
-    name: anvika-frontend
+    name: anvika-26
     env: static
     rootDir: frontend
     buildCommand: npm install && npm run build
