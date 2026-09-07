@@ -1,94 +1,87 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useTransform } from 'framer-motion';
 
-const Overlay = ({ scrollYProgress: externalProgress }) => {
-  const { scrollYProgress: fallbackProgress } = useScroll();
-  const scrollYProgress = externalProgress || fallbackProgress;
+const Overlay = ({ smoothProgress }) => {
+  // Section 1: Brand Hero (0% -> 20%)
+  const opacity1 = useTransform(smoothProgress, [0, 0.08, 0.16, 0.22], [1, 1, 0.2, 0]);
+  const y1 = useTransform(smoothProgress, [0, 0.22], [0, -60]);
+  const scale1 = useTransform(smoothProgress, [0, 0.22], [1, 0.96]);
 
-  // Section 1: "Anvika / Creative Fashion" (Visible 0% - 12%, fully fades out by 20%, strictly clamped to 0 afterwards)
-  const opacity1 = useTransform(scrollYProgress, [0, 0.10, 0.20, 1], [1, 1, 0, 0], { clamp: true });
-  const y1 = useTransform(scrollYProgress, [0, 0.20, 1], [0, -50, -50], { clamp: true });
-  const display1 = useTransform(scrollYProgress, (v) => (v <= 0.22 ? 'flex' : 'none'));
+  // Section 2: Narrative Focus (26% -> 52%)
+  const opacity2 = useTransform(smoothProgress, [0.24, 0.32, 0.44, 0.52], [0, 1, 1, 0]);
+  const y2 = useTransform(smoothProgress, [0.24, 0.36, 0.44, 0.52], [40, 0, 0, -40]);
 
-  // Section 2: "I build digital experiences." (Visible 28% - 55%, strictly 0 outside this window)
-  const opacity2 = useTransform(scrollYProgress, [0, 0.25, 0.35, 0.50, 0.60, 1], [0, 0, 1, 1, 0, 0], { clamp: true });
-  const y2 = useTransform(scrollYProgress, [0, 0.25, 0.35, 0.50, 0.60, 1], [40, 40, 0, 0, -40, -40], { clamp: true });
-  const display2 = useTransform(scrollYProgress, (v) => (v >= 0.24 && v <= 0.62 ? 'flex' : 'none'));
+  // Section 3: Craft & Grand Finale (58% -> 88%)
+  const opacity3 = useTransform(smoothProgress, [0.58, 0.68, 0.80, 0.90], [0, 1, 1, 0]);
+  const y3 = useTransform(smoothProgress, [0.58, 0.70, 0.80, 0.90], [40, 0, 0, -40]);
 
-  // Section 3: "Bridging design and engineering." (Visible 65% - 90%, strictly 0 outside this window)
-  const opacity3 = useTransform(scrollYProgress, [0, 0.65, 0.75, 0.88, 0.96, 1], [0, 0, 1, 1, 0, 0], { clamp: true });
-  const y3 = useTransform(scrollYProgress, [0, 0.65, 0.75, 0.88, 0.96, 1], [40, 40, 0, 0, -40, -40], { clamp: true });
-  const display3 = useTransform(scrollYProgress, (v) => (v >= 0.63 && v <= 0.98 ? 'flex' : 'none'));
+  // Scroll indicator hint (fades quickly on scroll)
+  const indicatorOpacity = useTransform(smoothProgress, [0, 0.05], [1, 0]);
 
   return (
     <div className="absolute inset-0 pointer-events-none z-10 font-sans text-white">
-      
-      {/* Section 1 - 0% */}
-      <motion.div 
-        style={{ opacity: opacity1, y: y1, display: display1 }}
-        className="absolute inset-0 flex-col items-center justify-center text-center px-4"
+
+      {/* Section 1 - Intro Title */}
+      <motion.div
+        style={{ opacity: opacity1, y: y1, scale: scale1 }}
+        className="fixed inset-0 flex flex-col items-center justify-center text-center px-6 select-none"
       >
-        <span className="text-xs uppercase tracking-[0.3em] font-medium text-white/80 mb-3 block">Haute Couture & Heritage</span>
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-light tracking-wide drop-shadow-lg">Anvika</h1>
-        <p className="text-sm md:text-base mt-4 tracking-[0.25em] uppercase font-light text-white/80 max-w-md">
-          Timeless Indian Drapes & Contemporary Silhouettes
+        <span className="text-xs uppercase tracking-[0.35em] text-gold-300 font-medium mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+          Artisanal Heritage Drapes
+        </span>
+        <h1 className="text-5xl sm:text-6xl md:text-8xl font-serif font-light tracking-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">
+          Anvika
+        </h1>
+        <p className="text-base sm:text-lg md:text-xl mt-4 tracking-[0.25em] uppercase font-light text-white/90 max-w-md drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+          Pure Silk &bull; Handwoven Grace
         </p>
-        <div className="flex items-center gap-4 mt-8 pointer-events-auto">
-          <a 
-            href="#new-arrivals" 
-            className="px-6 py-2.5 rounded-full bg-white text-black text-xs uppercase tracking-widest font-medium hover:bg-white/90 transition-colors shadow-lg"
-          >
-            New Arrivals
-          </a>
-          <a 
-            href="#sarees" 
-            className="px-6 py-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/40 text-white text-xs uppercase tracking-widest font-medium hover:bg-white/20 transition-colors"
-          >
-            Explore Sarees
-          </a>
+
+        {/* Scroll helper */}
+        <motion.div 
+          style={{ opacity: indicatorOpacity }}
+          className="absolute bottom-12 flex flex-col items-center gap-2"
+        >
+          <span className="text-[10px] tracking-[0.3em] uppercase text-white/70 drop-shadow-md">Scroll to Explore</span>
+          <div className="w-5 h-8 border border-white/40 rounded-full flex justify-center pt-1.5 drop-shadow-md">
+            <div className="w-1 h-2 bg-gold-400 rounded-full animate-bounce" />
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Section 2 - Narrative Left */}
+      <motion.div
+        style={{ opacity: opacity2, y: y2 }}
+        className="fixed inset-0 flex flex-col items-start justify-center px-8 sm:px-16 md:px-24 select-none"
+      >
+        <div className="max-w-xl">
+          <span className="text-xs uppercase tracking-[0.35em] text-gold-400 font-semibold block mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+            The Weave
+          </span>
+          <h2 className="text-3xl sm:text-5xl md:text-6xl font-serif font-light leading-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
+            Drape your <br />
+            <span className="italic font-serif text-gold-300">timeless elegance.</span>
+          </h2>
+          <p className="mt-4 text-sm sm:text-base text-white/90 leading-relaxed font-light drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+            Every thread spun with pure Banarasi zari, crafted by master weavers over hundreds of meticulous hours.
+          </p>
         </div>
       </motion.div>
 
-      {/* Section 2 - 30% */}
-      <motion.div 
-        style={{ opacity: opacity2, y: y2, display: display2 }}
-        className="absolute inset-0 flex-col items-start justify-center px-8 md:px-24"
+      {/* Section 3 - Craft Right */}
+      <motion.div
+        style={{ opacity: opacity3, y: y3 }}
+        className="fixed inset-0 flex flex-col items-end justify-center px-8 sm:px-16 md:px-24 text-right select-none"
       >
-        <span className="text-xs uppercase tracking-[0.3em] font-medium text-accent mb-3 block">01 / The Handloom Craft</span>
-        <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-light max-w-2xl leading-tight drop-shadow-lg">
-          Drape your story <br/> in pure silk.
-        </h2>
-        <p className="text-white/80 text-sm max-w-md mt-4 font-light leading-relaxed">
-          Woven with timeless motifs by generational master artisans across Varanasi, Chanderi, and Kanchipuram.
-        </p>
-        <div className="mt-8 pointer-events-auto">
-          <a 
-            href="#sarees" 
-            className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-white border-b border-white/60 pb-1 hover:border-white hover:text-accent transition-colors"
-          >
-            Discover Handloom Weaves →
-          </a>
-        </div>
-      </motion.div>
-
-      {/* Section 3 - 65% to 90% */}
-      <motion.div 
-        style={{ opacity: opacity3, y: y3, display: display3 }}
-        className="absolute inset-0 flex-col items-end justify-center px-8 md:px-24 text-right"
-      >
-        <span className="text-xs uppercase tracking-[0.3em] font-medium text-accent mb-3 block">02 / Festive Majesty</span>
-        <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif font-light max-w-2xl leading-tight drop-shadow-lg">
-          Where heritage <br/> meets modernity.
-        </h2>
-        <p className="text-white/80 text-sm max-w-md mt-4 font-light leading-relaxed">
-          Bespoke silhouettes tailored with exacting finesse for weddings, festivals, and unforgettable milestones.
-        </p>
-        <div className="mt-8 pointer-events-auto">
-          <a 
-            href="#ethnic-wear" 
-            className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-white border-b border-white/60 pb-1 hover:border-white hover:text-accent transition-colors"
-          >
-            Explore Celebration Edit →
-          </a>
+        <div className="max-w-xl flex flex-col items-end">
+          <span className="text-xs uppercase tracking-[0.35em] text-gold-400 font-semibold block mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+            The Legacy
+          </span>
+          <h2 className="text-3xl sm:text-5xl md:text-6xl font-serif font-light leading-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
+            Made to drape. <br />
+            <span className="italic font-serif text-gold-300">Made to remember.</span>
+          </h2>
+          <p className="mt-4 text-sm sm:text-base text-white/90 leading-relaxed font-light max-w-md drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+            A celebration of royal silhouettes, designed for momentous occasions and celebrations.
+          </p>
         </div>
       </motion.div>
 
