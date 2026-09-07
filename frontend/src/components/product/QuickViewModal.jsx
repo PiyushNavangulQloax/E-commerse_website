@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, Star, Check, Truck, ShieldCheck, Sparkles } from 'lucide-react';
+import { X, Heart, Star, Check, Truck, ShieldCheck, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useQuickView } from '../../context/QuickViewContext';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
@@ -20,9 +20,8 @@ const QuickViewModal = () => {
   useEffect(() => {
     if (selectedProduct) {
       setSelectedSize(selectedProduct.sizes?.[0] || 'Free Size');
-      setQuantity(1);
       setActiveImageIdx(0);
-      setAddedAnimation(false);
+      setQuantity(1);
     }
   }, [selectedProduct]);
 
@@ -75,12 +74,44 @@ const QuickViewModal = () => {
 
             {/* Left: Product Images */}
             <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-between bg-surface/30 border-b md:border-b-0 md:border-r border-border">
-              <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden bg-surface shadow-inner">
+              <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden bg-surface shadow-inner group">
                 <img
                   src={images[activeImageIdx] || '/demo-saree.jpg'}
                   alt={selectedProduct.name}
                   className="w-full h-full object-cover"
                 />
+
+                {/* Prev / Next Controls */}
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setActiveImageIdx(prev => (prev === 0 ? images.length - 1 : prev - 1))}
+                      className="absolute left-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-background/80 hover:bg-background text-text border border-border shadow backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label="Previous view"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <button
+                      onClick={() => setActiveImageIdx(prev => (prev === images.length - 1 ? 0 : prev + 1))}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-background/80 hover:bg-background text-text border border-border shadow backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label="Next view"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </>
+                )}
+
+                {/* Angle Label Badge */}
+                {images.length > 1 && (
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-md px-3 py-1 rounded-full border border-border text-[11px] text-text flex items-center gap-1.5 shadow-sm pointer-events-none">
+                    <span className="font-medium text-accent">
+                      {selectedProduct.imageLabels?.[activeImageIdx] || `Angle ${activeImageIdx + 1}`}
+                    </span>
+                    <span className="text-text-muted text-[10px]">
+                      ({activeImageIdx + 1}/{images.length})
+                    </span>
+                  </div>
+                )}
 
                 {selectedProduct.discount > 0 && (
                   <span className="absolute top-4 left-4 bg-accent text-white text-[10px] font-semibold tracking-widest uppercase px-3 py-1 rounded-full shadow-sm">
@@ -91,16 +122,21 @@ const QuickViewModal = () => {
 
               {/* Thumbnail Selector */}
               {images.length > 1 && (
-                <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
+                <div className="flex gap-2.5 mt-4 overflow-x-auto pb-1">
                   {images.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setActiveImageIdx(idx)}
-                      className={`relative w-14 h-18 rounded-xl overflow-hidden border-2 transition-all ${
-                        activeImageIdx === idx ? 'border-accent scale-105' : 'border-transparent opacity-70 hover:opacity-100'
+                      className={`relative aspect-[3/4] w-14 rounded-xl overflow-hidden border-2 transition-all ${
+                        activeImageIdx === idx ? 'border-accent scale-105 shadow-sm ring-2 ring-accent/20' : 'border-transparent opacity-70 hover:opacity-100'
                       }`}
                     >
                       <img src={img} alt="thumb" className="w-full h-full object-cover" />
+                      {selectedProduct.imageLabels?.[idx] && (
+                        <span className="absolute bottom-0 inset-x-0 bg-black/60 text-[7px] text-white text-center py-0.5 uppercase truncate px-0.5">
+                          {selectedProduct.imageLabels[idx].split(' ')[0]}
+                        </span>
+                      )}
                     </button>
                   ))}
                 </div>

@@ -20,7 +20,7 @@ const FeaturedCategories = () => {
     { 
       name: 'DRESSES', 
       desc: 'Flowing cuts & contemporary elegance.', 
-      image: '/saree-blackgold.jpg',
+      image: '/dress-beige-front.jpg',
       link: '/category/dresses'
     },
     { 

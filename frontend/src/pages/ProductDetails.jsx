@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Truck, RefreshCw, ChevronDown, Check, Star, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
+import { Heart, Truck, RefreshCw, ChevronDown, Check, Star, ShieldCheck, Sparkles, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import Button from '../components/common/Button';
 import { FadeIn, RevealOnScroll } from '../components/animations/RevealOnScroll';
 import { products } from '../data/products';
@@ -73,18 +73,23 @@ const ProductDetails = () => {
           <div className="flex flex-col-reverse md:flex-row gap-4 sticky top-36">
             {/* Thumbnails */}
             {images.length > 1 && (
-              <div className="flex md:flex-col gap-3 overflow-x-auto md:w-20 flex-shrink-0 pb-2 md:pb-0 hide-scrollbar">
+              <div className="flex md:flex-col gap-3 overflow-x-auto md:w-24 flex-shrink-0 pb-2 md:pb-0 hide-scrollbar">
                 {images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setSelectedImageIdx(idx)}
-                    className={`relative aspect-[3/4] w-16 md:w-full overflow-hidden rounded-xl border-2 transition-all ${
+                    className={`group relative aspect-[3/4] w-16 md:w-full overflow-hidden rounded-xl border-2 transition-all text-left ${
                       selectedImageIdx === idx 
-                        ? 'border-accent scale-105 shadow-sm' 
+                        ? 'border-accent scale-105 shadow-sm ring-2 ring-accent/20' 
                         : 'border-transparent opacity-70 hover:opacity-100'
                     }`}
                   >
                     <img src={img} alt={`${product.name} preview ${idx + 1}`} className="w-full h-full object-cover" />
+                    {product.imageLabels?.[idx] && (
+                      <span className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-[2px] text-[8px] text-white py-0.5 text-center truncate px-1 uppercase tracking-wider">
+                        {product.imageLabels[idx].split(' ')[0]}
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -98,12 +103,44 @@ const ProductDetails = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35 }}
+                  transition={{ duration: 0.3 }}
                   src={images[selectedImageIdx] || '/demo-saree.jpg'}
                   alt={product.name}
                   className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-105"
                 />
               </AnimatePresence>
+
+              {/* Prev / Next Arrows */}
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setSelectedImageIdx(prev => (prev === 0 ? images.length - 1 : prev - 1))}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/80 hover:bg-background text-text border border-border/80 shadow-md backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                  <button
+                    onClick={() => setSelectedImageIdx(prev => (prev === images.length - 1 ? 0 : prev + 1))}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/80 hover:bg-background text-text border border-border/80 shadow-md backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label="Next image"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </>
+              )}
+
+              {/* Angle Label Pill */}
+              {images.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-border text-xs text-text flex items-center gap-2 shadow-sm pointer-events-none">
+                  <span className="font-medium text-[11px] tracking-wider uppercase text-accent">
+                    {product.imageLabels?.[selectedImageIdx] || `View ${selectedImageIdx + 1}`}
+                  </span>
+                  <span className="text-text-muted text-[10px]">
+                    ({selectedImageIdx + 1} / {images.length})
+                  </span>
+                </div>
+              )}
 
               {product.discount > 0 && (
                 <span className="absolute top-4 left-4 bg-accent text-white text-[11px] font-semibold tracking-widest uppercase px-3.5 py-1.5 rounded-full shadow-md">
