@@ -50,18 +50,42 @@ const HeroVideo = () => {
     return () => clearTimeout(timer);
   }, [currentSlideIndex, currentSlide.duration]);
 
-  // Ensure videos autoplay reliably
+  // Ensure videos autoplay reliably without requiring any user click
   useEffect(() => {
-    const playVideo = (videoEl) => {
-      if (videoEl) {
-        videoEl.muted = isMuted;
-        videoEl.play().catch(() => {});
+    const startAutoplay = (videoEl) => {
+      if (!videoEl) return;
+      videoEl.muted = true;
+      videoEl.defaultMuted = true;
+      videoEl.playsInline = true;
+      videoEl.setAttribute('muted', '');
+      videoEl.setAttribute('playsinline', '');
+      videoEl.setAttribute('autoplay', '');
+      
+      const playPromise = videoEl.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch(() => {
+            // If browser policy deferred it, re-trigger muted on any interaction
+            const unlockPlay = () => {
+              videoEl.muted = true;
+              videoEl.play().catch(() => {});
+              window.removeEventListener('click', unlockPlay);
+              window.removeEventListener('touchstart', unlockPlay);
+              window.removeEventListener('scroll', unlockPlay);
+            };
+            window.addEventListener('click', unlockPlay, { once: true });
+            window.addEventListener('touchstart', unlockPlay, { once: true });
+            window.addEventListener('scroll', unlockPlay, { once: true });
+          });
       }
     };
 
-    playVideo(videoRef1.current);
-    playVideo(videoRef2.current);
-  }, [isMuted]);
+    startAutoplay(videoRef1.current);
+    startAutoplay(videoRef2.current);
+  }, []);
 
   const toggleSound = () => {
     const newMuteState = !isMuted;
@@ -103,8 +127,11 @@ const HeroVideo = () => {
           src="/videos/hero-video-1.mp4"
           autoPlay
           loop
-          muted={isMuted}
+          muted
+          defaultMuted
           playsInline
+          preload="auto"
+          onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
             activeVideoIndex === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'
           }`}
@@ -116,8 +143,11 @@ const HeroVideo = () => {
           src="/videos/hero-video-2.mp4"
           autoPlay
           loop
-          muted={isMuted}
+          muted
+          defaultMuted
           playsInline
+          preload="auto"
+          onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
             activeVideoIndex === 1 ? 'opacity-100 z-10' : 'opacity-0 z-0'
           }`}
