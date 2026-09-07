@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2, VolumeX, ChevronDown, Sparkles, ArrowRight, Play, Pause } from 'lucide-react';
+import { ChevronDown, Sparkles, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const SLIDES = [
@@ -33,15 +33,11 @@ const SLIDES = [
 
 const HeroVideo = () => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const [isMuted, setIsMuted] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
-  const videoRef1 = useRef(null);
-  const videoRef2 = useRef(null);
+  const videoRef = useRef(null);
 
   const currentSlide = SLIDES[currentSlideIndex];
 
-  // Text transition timer based on each slide's specific duration
+  // Timed narrative text transition (3s, 3s, 5.5s)
   useEffect(() => {
     const timer = setTimeout(() => {
       setCurrentSlideIndex((prev) => (prev + 1) % SLIDES.length);
@@ -50,62 +46,50 @@ const HeroVideo = () => {
     return () => clearTimeout(timer);
   }, [currentSlideIndex, currentSlide.duration]);
 
-  // Ensure videos autoplay reliably without requiring any user click
+  // Guaranteed 100% hands-free automatic video playback
   useEffect(() => {
-    const startAutoplay = (videoEl) => {
-      if (!videoEl) return;
-      videoEl.muted = true;
-      videoEl.defaultMuted = true;
-      videoEl.playsInline = true;
-      videoEl.setAttribute('muted', '');
-      videoEl.setAttribute('playsinline', '');
-      videoEl.setAttribute('autoplay', '');
-      
-      const playPromise = videoEl.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch(() => {
-            // If browser policy deferred it, re-trigger muted on any interaction
-            const unlockPlay = () => {
-              videoEl.muted = true;
-              videoEl.play().catch(() => {});
-              window.removeEventListener('click', unlockPlay);
-              window.removeEventListener('touchstart', unlockPlay);
-              window.removeEventListener('scroll', unlockPlay);
-            };
-            window.addEventListener('click', unlockPlay, { once: true });
-            window.addEventListener('touchstart', unlockPlay, { once: true });
-            window.addEventListener('scroll', unlockPlay, { once: true });
-          });
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.autoplay = true;
+    video.loop = true;
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('autoplay', '');
+    video.setAttribute('loop', '');
+
+    const tryPlay = () => {
+      video.muted = true;
+      const promise = video.play();
+      if (promise !== undefined) {
+        promise.catch(() => {
+          // If browser policy temporarily deferred, trigger immediately on first user interaction
+          const resume = () => {
+            video.muted = true;
+            video.play().catch(() => {});
+            ['click', 'touchstart', 'scroll', 'mousemove'].forEach(ev => 
+              window.removeEventListener(ev, resume)
+            );
+          };
+          ['click', 'touchstart', 'scroll', 'mousemove'].forEach(ev => 
+            window.addEventListener(ev, resume, { once: true, passive: true })
+          );
+        });
       }
     };
 
-    startAutoplay(videoRef1.current);
-    startAutoplay(videoRef2.current);
+    tryPlay();
+    video.addEventListener('canplay', tryPlay);
+    video.addEventListener('loadedmetadata', tryPlay);
+
+    return () => {
+      video.removeEventListener('canplay', tryPlay);
+      video.removeEventListener('loadedmetadata', tryPlay);
+    };
   }, []);
-
-  const toggleSound = () => {
-    const newMuteState = !isMuted;
-    setIsMuted(newMuteState);
-    if (videoRef1.current) videoRef1.current.muted = newMuteState;
-    if (videoRef2.current) videoRef2.current.muted = newMuteState;
-  };
-
-  const togglePlay = () => {
-    const nextPlayState = !isPlaying;
-    setIsPlaying(nextPlayState);
-    const activeRef = activeVideoIndex === 0 ? videoRef1.current : videoRef2.current;
-    if (activeRef) {
-      if (nextPlayState) {
-        activeRef.play().catch(() => {});
-      } else {
-        activeRef.pause();
-      }
-    }
-  };
 
   const scrollToContent = () => {
     const contentElement = document.getElementById('featured-content');
@@ -117,49 +101,32 @@ const HeroVideo = () => {
   };
 
   return (
-    <section className="relative w-full h-screen overflow-hidden bg-black text-white select-none">
+    <section className="relative w-full h-screen overflow-hidden bg-black text-white select-none pointer-events-auto">
       
-      {/* Background Video Layer with Seamless Loop */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden">
-        {/* Video 1 */}
+      {/* 100% Background Ambient Looping Video - Zero manual controls, purely automatic */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
         <video
-          ref={videoRef1}
+          ref={videoRef}
           src="/videos/hero-video-1.mp4"
           autoPlay
           loop
           muted
           defaultMuted
           playsInline
+          disablePictureInPicture
+          disableRemotePlayback
+          controls={false}
           preload="auto"
-          onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-            activeVideoIndex === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'
-          }`}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
         />
 
-        {/* Video 2 (Crossfade switchable) */}
-        <video
-          ref={videoRef2}
-          src="/videos/hero-video-2.mp4"
-          autoPlay
-          loop
-          muted
-          defaultMuted
-          playsInline
-          preload="auto"
-          onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-            activeVideoIndex === 1 ? 'opacity-100 z-10' : 'opacity-0 z-0'
-          }`}
-        />
-
-        {/* Cinematic Gradient Overlays for High Legibility & Luxury Contrast */}
-        <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/85 via-black/35 to-black/60 pointer-events-none" />
-        <div className="absolute inset-0 z-20 bg-radial-vignette opacity-60 pointer-events-none" />
+        {/* Cinematic Gradient Overlays for Luxury Contrast & Crisp Typography */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/60 pointer-events-none" />
+        <div className="absolute inset-0 bg-radial-vignette opacity-60 pointer-events-none" />
       </div>
 
       {/* Main Centered Content Animation */}
-      <div className="relative z-30 w-full h-full flex flex-col items-center justify-center px-6 text-center max-w-5xl mx-auto">
+      <div className="relative z-30 w-full h-full flex flex-col items-center justify-center px-6 text-center max-w-5xl mx-auto pointer-events-none">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide.id}
@@ -167,7 +134,7 @@ const HeroVideo = () => {
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, y: -25, filter: 'blur(6px)' }}
             transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-center"
+            className="flex flex-col items-center pointer-events-auto"
           >
             {/* Tag Badge */}
             <motion.div 
@@ -223,16 +190,16 @@ const HeroVideo = () => {
         </AnimatePresence>
       </div>
 
-      {/* Bottom Interface Controls & Story Progress Bar */}
-      <div className="absolute bottom-8 left-0 w-full z-30 px-6 sm:px-12 flex items-center justify-between">
+      {/* Bottom Interface - Story Progress Bar & Scroll Indicator Only */}
+      <div className="absolute bottom-8 left-0 w-full z-30 px-6 sm:px-12 flex items-center justify-between pointer-events-none">
         
         {/* Story Slide Indicators */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 pointer-events-auto">
           {SLIDES.map((slide, idx) => (
             <button
               key={slide.id}
               onClick={() => setCurrentSlideIndex(idx)}
-              className="group relative h-1.5 rounded-full overflow-hidden transition-all duration-300"
+              className="group relative h-1.5 rounded-full overflow-hidden transition-all duration-300 cursor-pointer"
               style={{
                 width: currentSlideIndex === idx ? '36px' : '14px',
                 backgroundColor: 'rgba(255,255,255,0.25)'
@@ -254,7 +221,7 @@ const HeroVideo = () => {
         {/* Center Scroll Prompt */}
         <button
           onClick={scrollToContent}
-          className="hidden sm:flex flex-col items-center gap-1.5 text-white/70 hover:text-white transition-colors cursor-pointer group"
+          className="flex flex-col items-center gap-1.5 text-white/70 hover:text-white transition-colors cursor-pointer group pointer-events-auto"
           aria-label="Scroll down"
         >
           <span className="text-[10px] uppercase tracking-[0.3em] font-light group-hover:tracking-[0.35em] transition-all">
@@ -263,35 +230,8 @@ const HeroVideo = () => {
           <ChevronDown size={18} className="animate-bounce text-gold-400" />
         </button>
 
-        {/* Media Controls (Sound & Play/Pause & Dual Video Switcher) */}
-        <div className="flex items-center gap-3">
-          {/* Dual video toggle if 2 videos available */}
-          <button
-            onClick={() => setActiveVideoIndex((prev) => (prev === 0 ? 1 : 0))}
-            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-[10px] uppercase tracking-wider text-white/80 hover:text-white transition-all"
-            title="Switch Video View"
-          >
-            <span>Angle {activeVideoIndex + 1}</span>
-          </button>
-
-          {/* Play/Pause */}
-          <button
-            onClick={togglePlay}
-            className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/60 transition-all"
-            aria-label={isPlaying ? "Pause video" : "Play video"}
-          >
-            {isPlaying ? <Pause size={15} /> : <Play size={15} />}
-          </button>
-
-          {/* Sound Mute/Unmute */}
-          <button
-            onClick={toggleSound}
-            className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/60 transition-all"
-            aria-label={isMuted ? "Unmute audio" : "Mute audio"}
-          >
-            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} className="text-gold-400" />}
-          </button>
-        </div>
+        {/* Empty placeholder for clean visual symmetry */}
+        <div className="w-16 hidden sm:block" />
 
       </div>
 
