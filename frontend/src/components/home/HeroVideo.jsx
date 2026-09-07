@@ -46,7 +46,19 @@ const HeroVideo = () => {
     return () => clearTimeout(timer);
   }, [currentSlideIndex, currentSlide.duration]);
 
-  // Guaranteed 100% hands-free automatic video playback
+  // Guaranteed 100% hands-free automatic video playback using callback ref and multiple triggers
+  const setVideoRef = (el) => {
+    if (el) {
+      videoRef.current = el;
+      el.muted = true;
+      el.defaultMuted = true;
+      el.playsInline = true;
+      el.loop = true;
+      el.autoplay = true;
+      el.play().catch(() => {});
+    }
+  };
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -57,33 +69,36 @@ const HeroVideo = () => {
     video.loop = true;
 
     const playVideo = () => {
+      if (!video) return;
       video.muted = true;
       const promise = video.play();
       if (promise !== undefined) {
         promise.catch(() => {
-          // Fallback if browser requires user gesture
+          // If browser policy deferred, immediately start on any initial page gesture
           const handleFirstGesture = () => {
-            video.muted = true;
-            video.play().catch(() => {});
-            ['click', 'touchstart', 'scroll', 'keydown'].forEach(evt => 
-              document.removeEventListener(evt, handleFirstGesture)
+            if (video) {
+              video.muted = true;
+              video.play().catch(() => {});
+            }
+            ['click', 'touchstart', 'scroll', 'mousemove', 'keydown'].forEach(evt => 
+              window.removeEventListener(evt, handleFirstGesture)
             );
           };
-          ['click', 'touchstart', 'scroll', 'keydown'].forEach(evt => 
-            document.addEventListener(evt, handleFirstGesture, { once: true, passive: true })
+          ['click', 'touchstart', 'scroll', 'mousemove', 'keydown'].forEach(evt => 
+            window.addEventListener(evt, handleFirstGesture, { once: true, passive: true })
           );
         });
       }
     };
 
-    // Play immediately and on all lifecycle events
     playVideo();
-    video.addEventListener('loadedmetadata', playVideo);
+    video.addEventListener('loadeddata', playVideo);
     video.addEventListener('canplay', playVideo);
     video.addEventListener('canplaythrough', playVideo);
+    video.addEventListener('playing', () => {});
 
     return () => {
-      video.removeEventListener('loadedmetadata', playVideo);
+      video.removeEventListener('loadeddata', playVideo);
       video.removeEventListener('canplay', playVideo);
       video.removeEventListener('canplaythrough', playVideo);
     };
@@ -104,16 +119,16 @@ const HeroVideo = () => {
       {/* 100% Background Ambient Looping Video - Zero manual controls, purely automatic */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
         <video
-          ref={videoRef}
+          ref={setVideoRef}
+          src="/videos/hero-video-1.mp4"
           autoPlay
           loop
           muted
+          defaultMuted
           playsInline
           preload="auto"
           className="w-full h-full object-cover pointer-events-none"
-        >
-          <source src="/videos/hero-video-1.mp4" type="video/mp4" />
-        </video>
+        />
 
         {/* Soft luxury vignette overlay for high contrast text without dimming the video */}
         <div className="absolute inset-0 bg-black/20 pointer-events-none" />
