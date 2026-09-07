@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-primary: var(--color-primary);
+  --color-accent: var(--color-accent);
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
+  --color-border: var(--color-border);
+  
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+@layer base {
+  :root {
+    /* Default Theme: Best (Premium warm ivory with muted rose and antique gold accents) */
+    --color-background: #FCFAF8; /* Softer, brighter cream */
+    --color-surface: #F5EFE9; /* Delicate beige */
+    --color-primary: #3A312F; /* Softer charcoal */
+    --color-accent: #A87A75; /* Elegant dusty rose */
+    --color-text: #3A312F;
+    --color-text-muted: #8A7F7A;
+    --color-border: #EBE1DA;
+  }
+
+  [data-theme="spiced"] {
+    --color-background: #FDF9F7;
+    --color-surface: #F4E8E1;
+    --color-primary: #633626;
+    --color-accent: #B06951;
+    --color-text: #45281D;
+    --color-text-muted: #8F6D61;
+    --color-border: #E8D6CC;
+  }
+
+  [data-theme="fresh"] {
+    --color-background: #F8FAF8;
+    --color-surface: #EAF0EA;
+    --color-primary: #294033;
+    --color-accent: #658572;
+    --color-text: #24362A;
+    --color-text-muted: #6B7D72;
+    --color-border: #D4E0D6;
+  }
+
+  [data-theme="dusk"] {
+    --color-background: #F6F7F9;
+    --color-surface: #E7EBEF;
+    --color-primary: #223145;
+    --color-accent: #5C718C;
+    --color-text: #1B2636;
+    --color-text-muted: #606E80;
+    --color-border: #D2D9E0;
+  }
+
+  [data-theme="best"] {
+    --color-background: #FCFAF8;
+    --color-surface: #F5EFE9;
+    --color-primary: #3A312F;
+    --color-accent: #A87A75;
+    --color-text: #3A312F;
+    --color-text-muted: #8A7F7A;
+    --color-border: #EBE1DA;
+  }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  transition: background-color 0.5s ease, color 0.5s ease;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 400; /* More elegant, thinner serif */
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px; /* Thinner */
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}

@@ -1,0 +1,105 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { FadeIn } from '../../components/animations/RevealOnScroll';
+import Button from '../../components/common/Button';
+import axios from 'axios';
+
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const { login } = useAuth();
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      // In a real app with backend running, this would be:
+      // const { data } = await axios.post('/api/users/login', { email, password });
+      // login(data);
+      
+      // Simulating login for frontend demo
+      setTimeout(() => {
+        login({ _id: '1', name: 'Jane Customer', email, role: 'customer' });
+        setIsLoading(false);
+      }, 1000);
+      
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex">
+      {/* Left side - Image */}
+      <div className="hidden lg:block lg:w-1/2 relative bg-surface">
+        <img 
+          src="https://images.unsplash.com/photo-1583391733959-b202242138bc?q=80&w=1200&auto=format&fit=crop" 
+          alt="Login Fashion"
+          className="absolute inset-0 h-full w-full object-cover object-top"
+        />
+        <div className="absolute inset-0 bg-black/10" />
+      </div>
+
+      {/* Right side - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 bg-background">
+        <FadeIn className="w-full max-w-md">
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-serif text-text mb-2">Welcome Back</h1>
+            <p className="text-text-muted">Sign in to access your wishlist and orders.</p>
+          </div>
+
+          {error && <div className="bg-red-100 text-red-700 p-3 mb-6 rounded-sm text-sm">{error}</div>}
+
+          <form onSubmit={submitHandler} className="flex flex-col gap-6">
+            <div>
+              <label className="block text-sm font-medium text-text mb-2">Email Address</label>
+              <input 
+                type="email" 
+                required 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-border bg-surface text-text rounded-sm focus:outline-none focus:ring-1 focus:ring-accent transition-all"
+                placeholder="you@example.com"
+              />
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-text">Password</label>
+                <Link to="/forgot-password" className="text-xs text-text-muted hover:text-text transition-colors">Forgot Password?</Link>
+              </div>
+              <input 
+                type="password" 
+                required 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-border bg-surface text-text rounded-sm focus:outline-none focus:ring-1 focus:ring-accent transition-all"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <Button type="submit" className="w-full h-12 mt-2" isLoading={isLoading}>
+              Sign In
+            </Button>
+          </form>
+
+          <div className="mt-8 text-center text-sm text-text-muted">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-text font-medium hover:text-accent transition-colors border-b border-transparent hover:border-accent">
+              Create one
+            </Link>
+          </div>
+        </FadeIn>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
