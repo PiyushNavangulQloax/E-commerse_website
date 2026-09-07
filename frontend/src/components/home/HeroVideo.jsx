@@ -54,40 +54,38 @@ const HeroVideo = () => {
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
-    video.autoplay = true;
     video.loop = true;
-    video.setAttribute('muted', '');
-    video.setAttribute('playsinline', '');
-    video.setAttribute('autoplay', '');
-    video.setAttribute('loop', '');
 
-    const tryPlay = () => {
+    const playVideo = () => {
       video.muted = true;
       const promise = video.play();
       if (promise !== undefined) {
         promise.catch(() => {
-          // If browser policy temporarily deferred, trigger immediately on first user interaction
-          const resume = () => {
+          // Fallback if browser requires user gesture
+          const handleFirstGesture = () => {
             video.muted = true;
             video.play().catch(() => {});
-            ['click', 'touchstart', 'scroll', 'mousemove'].forEach(ev => 
-              window.removeEventListener(ev, resume)
+            ['click', 'touchstart', 'scroll', 'keydown'].forEach(evt => 
+              document.removeEventListener(evt, handleFirstGesture)
             );
           };
-          ['click', 'touchstart', 'scroll', 'mousemove'].forEach(ev => 
-            window.addEventListener(ev, resume, { once: true, passive: true })
+          ['click', 'touchstart', 'scroll', 'keydown'].forEach(evt => 
+            document.addEventListener(evt, handleFirstGesture, { once: true, passive: true })
           );
         });
       }
     };
 
-    tryPlay();
-    video.addEventListener('canplay', tryPlay);
-    video.addEventListener('loadedmetadata', tryPlay);
+    // Play immediately and on all lifecycle events
+    playVideo();
+    video.addEventListener('loadedmetadata', playVideo);
+    video.addEventListener('canplay', playVideo);
+    video.addEventListener('canplaythrough', playVideo);
 
     return () => {
-      video.removeEventListener('canplay', tryPlay);
-      video.removeEventListener('loadedmetadata', tryPlay);
+      video.removeEventListener('loadedmetadata', playVideo);
+      video.removeEventListener('canplay', playVideo);
+      video.removeEventListener('canplaythrough', playVideo);
     };
   }, []);
 
@@ -101,28 +99,25 @@ const HeroVideo = () => {
   };
 
   return (
-    <section className="relative w-full h-screen overflow-hidden bg-black text-white select-none pointer-events-auto">
+    <section className="relative w-full h-screen overflow-hidden bg-[#121212] text-white select-none pointer-events-auto">
       
       {/* 100% Background Ambient Looping Video - Zero manual controls, purely automatic */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
         <video
           ref={videoRef}
-          src="/videos/hero-video-1.mp4"
           autoPlay
           loop
           muted
-          defaultMuted
           playsInline
-          disablePictureInPicture
-          disableRemotePlayback
-          controls={false}
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
-        />
+          className="w-full h-full object-cover pointer-events-none"
+        >
+          <source src="/videos/hero-video-1.mp4" type="video/mp4" />
+        </video>
 
-        {/* Cinematic Gradient Overlays for Luxury Contrast & Crisp Typography */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/60 pointer-events-none" />
-        <div className="absolute inset-0 bg-radial-vignette opacity-60 pointer-events-none" />
+        {/* Soft luxury vignette overlay for high contrast text without dimming the video */}
+        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/50 pointer-events-none" />
       </div>
 
       {/* Main Centered Content Animation */}
