@@ -70,7 +70,7 @@ const ProductDetails = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           
           {/* Left Column: Image Gallery */}
-          <div className="flex flex-col-reverse md:flex-row gap-4 sticky top-36">
+          <div className="flex flex-col-reverse md:flex-row gap-4 lg:sticky top-36">
             {/* Thumbnails */}
             {images.length > 1 && (
               <div className="flex md:flex-col gap-3 overflow-x-auto md:w-24 flex-shrink-0 pb-2 md:pb-0 hide-scrollbar">
